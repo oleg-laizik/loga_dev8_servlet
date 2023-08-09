@@ -27,7 +27,8 @@ public class TimeServlet extends HttpServlet {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
         LocalDateTime currentTime;
 
-        if (timezone != null) {
+        if (request.getParameter(TIMEZONE_COOKIE) == null ||
+                request.getParameter(TIMEZONE_COOKIE).isEmpty()){
             currentTime = LocalDateTime.now(timezone);
             response.addCookie(new Cookie(TIMEZONE_COOKIE, timezone.getId()));
         } else {

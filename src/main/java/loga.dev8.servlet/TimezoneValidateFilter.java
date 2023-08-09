@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Set;
+import java.util.TimeZone;
 
 @WebFilter(value = "/time")
 public class TimezoneValidateFilter extends HttpFilter {
@@ -33,6 +34,8 @@ public class TimezoneValidateFilter extends HttpFilter {
     }
 
     private boolean isValidTimezone(String timezone) {
-        return ZoneId.getAvailableZoneIds().contains(timezone);
+        String id = timezone.replace("UTC", "Etc/GMT");
+        return Set.of(TimeZone.getAvailableIDs()).contains(id);
     }
+
 }

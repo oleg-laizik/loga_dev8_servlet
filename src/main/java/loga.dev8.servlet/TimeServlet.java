@@ -1,51 +1,41 @@
 package loga.dev8.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
-@WebServlet("/time")
+@WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
 
-    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss z";
-    public static final String TIMEZONE_COOKIE = "lastTimezone";
+    public static final String DATE = "yyyy-MM-dd HH:mm:ss z";
+    public static final String TIMEZONE = "timezone";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        String requestedTimezone = request.getParameter(TIMEZONE);
 
-        String timezoneParam = request.getParameter("timezone");
-        ZoneId timezone = parseTimezone(timezoneParam);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
-        LocalDateTime currentTime;
-
-        if (request.getParameter(TIMEZONE_COOKIE) == null ||
-                request.getParameter(TIMEZONE_COOKIE).isEmpty()){
-            currentTime = LocalDateTime.now(timezone);
-            response.addCookie(new Cookie(TIMEZONE_COOKIE, timezone.getId()));
+        if (requestedTimezone == null || requestedTimezone.isEmpty()) {
+            response.getWriter().write(getFormattedCurrentTime("UTC"));
         } else {
-            currentTime = LocalDateTime.now();
+            String formattedTime = getFormattedTimeInTimezone(requestedTimezone);
+            response.getWriter().write(formattedTime);
         }
-
-        String formattedTime = currentTime.format(formatter);
-
-        response.getWriter().println("<html><body>");
-        response.getWriter().println("Current Time: " + formattedTime);
-        response.getWriter().println("</body></html>");
     }
 
-    private ZoneId parseTimezone(String timezone) {
-        if (timezone != null) {
-            return ZoneId.of(timezone);
-        }
-        return null;
+    private String getFormattedTimeInTimezone(String timezone) {
+        Instant currentTime = new Date().toInstant();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE)
+                .withZone(ZoneId.of(timezone));
+        return formatter.format(currentTime);
+    }
+
+    private String getFormattedCurrentTime(String timezone) {
+        return getFormattedTimeInTimezone(timezone);
     }
 }

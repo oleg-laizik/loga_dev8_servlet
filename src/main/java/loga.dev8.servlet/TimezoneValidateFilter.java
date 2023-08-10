@@ -1,5 +1,4 @@
 package loga.dev8.servlet;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -8,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.ZoneId;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -37,5 +35,4 @@ public class TimezoneValidateFilter extends HttpFilter {
         String id = timezone.replace("UTC", "Etc/GMT");
         return Set.of(TimeZone.getAvailableIDs()).contains(id);
     }
-
 }
